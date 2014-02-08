@@ -8,7 +8,7 @@ Under development. DO NOT USE (yet).
 
 Be sure you have a running default ruby and curl installed.
 
-    curl -L https://raw.github.com/eduvo/logring/master/install | bash -s -- --master
+    curl -s -L https://raw.github.com/eduvo/logring/master/install | bash -s -- --master
 
 Availble options
 

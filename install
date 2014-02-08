@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # thanks RVM project for its so inspirationnal collection of bash scripts
 
-VERSION=0.1
 
 if [[ "$*" =~ --trace ]]
   then
@@ -10,19 +9,54 @@ if [[ "$*" =~ --trace ]]
   export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}  \${LINENO} > "
 fi
 
+typeset DEV
+VERSION=0.1
+CURDIR=$(pwd)
 set -o errtrace
 shopt -s extglob
 
+DESTDIR="./logring"
+
 show_version() {
-  echo "Logring v${VERSION} - https://github.com/eduvo/logring"
+  echo "Logring installer v${VERSION} - https://github.com/eduvo/logring"
 }
 
-master_logring() {
-  echo "master"
+base_install() {
+  echo "Installing Logring in ${DESTDIR} ..."
+  mkdir "${DESTDIR}" 2> /dev/null
+  cd "${DESTDIR}"
+  echo "source 'https://rubygems.org'" > Gemfile
+  if [[ ${DEV:-0} == 0 ]]
+    then
+    echo "gem 'logring'" >> Gemfile
+  else
+    echo "gem 'logring', path: '${CURDIR}'" >> Gemfile
+  fi
+  bundle install
+  rvm list
+  if [[ $? == 0 ]]
+    then
+    echo "... all installed."
+  else
+    echo "Oops."
+  fi
 }
 
-slave_logring() {
-  echo "slave"
+slave_install() {
+  echo "Installing Logring in ${DESTDIR} ..."
+  mkdir "${DESTDIR}" 2> /dev/null
+  cd "${DESTDIR}"
+  mkdir "log" 2> /dev/null
+  mkdir "cache" 2> /dev/null
+  echo "source 'https://rubygems.org'" > Gemfile
+  echo "gem 'request-log-analyzer'" >> Gemfile
+  bundle install
+  if [[ $? == 0 ]]
+    then
+    echo "... all installed."
+  else
+    echo "Oops."
+  fi
 }
 
 install_usage() {
@@ -31,25 +65,8 @@ install_usage() {
     ${0} [options]
 
   Options:
-    --logfile-rails=<file>
-    --logfile-rails3=<file>
-    --logfile-merb=<file>
-    --logfile-rack=<file>
-    --logfile-delayed_job=<file>
-    --logfile-apache=<file>
-    --logfile-amazon_s3=<file>
-    --logfile-mysql=<file>
-    --logfile-nginx=<file>
-    --logfile-postgresql=<file>
-    --logfile-oink=<file>
-    --logfile-haproxy=<file>
-    Each option can be repeated several times.
-    You may have various different rails logs to analyze.
-
-    --master  install the central node
-    --slave   install a slave node
     --dest    where to install logring config and files (default to ./logring)
-
+    --dev     will use local dir as gem for development purpose
     --trace   debug view
     --help    this help text
 
@@ -62,46 +79,45 @@ parse_args() {
     token="$1"
     shift
     case "$token" in
-      (--logfile-[_a-z]*=*)
-        value="${token#*=}"
-        token="${token%%=*}"
-        logtype="${token#--*-}"
-        if [[ ! -f "${value}" && ! -L "${value}" ]]
-        then
-          echo "$value does not exist."
-          exit 1
-        elif [[ ! -r "${value}" ]]
-        then
-          echo "$value is not readable."
-          exit 1
+      (--dest=*)
+        dir="${token#*=}"
+        if [[ -d "${dir}" ]]
+          then
+          if [[ ! -w "${dir}" ]]
+            then
+            echo "Destination dir '${dir}' is not writable."
+            exit 1
+          fi
         else
-          export lr_logfile
+          dirdir=$(dirname $dir)
+          if [[ ! -w "${dirdir}" ]]
+            then
+            echo "Dir '${dirdir}' is not writable."
+            exit 1
+          fi
         fi
+        DESTDIR="${dir}"
         ;;
-      (--dest)
-
-      (--trace)
+      (--dev)
+          DEV=1
         ;;
       (--version)
         show_version
         exit 0
         ;;
-      (--master)
-        master_logring
-        exit 0
-        ;;
       (--slave)
-        slave_logring
+        slave_install
         exit 0
         ;;
-      (*)
+      (--help)
         install_usage
         exit 0
         ;;
     esac
   done
-  echo "ok"
 }
 
 parse_args "$@"
+base_install
+
 exit 0

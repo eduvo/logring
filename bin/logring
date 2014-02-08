@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require "bundler"
+require "logring/version"
+require "logring/cli"
+
+Logring::Cli.start
