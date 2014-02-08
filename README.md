@@ -1,20 +1,14 @@
 # Logring
 
-TODO: Write a gem description
+One Logring to rule them all.
+
+Under development. DO NOT USE (yet).
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Be sure you have a running default ruby and curl installed.
 
-    gem 'logring'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install logring
+    curl -L https://raw.github.com/eduvo/logring/master/install | bash --master
 
 ## Usage
 

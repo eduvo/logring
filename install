@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# thanks RVM project for its so inspirationnal collection of bash scripts
+
+VERSION=0.1
+
+if [[ "$*" =~ --trace ]]
+  then
+  set -x
+  set -o xtrace
+  export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}  \${LINENO} > "
+fi
+
+set -o errtrace
+shopt -s extglob
+
+show_version() {
+  echo "Logring v${VERSION} - https://github.com/eduvo/logring"
+}
+
+master_logring() {
+  echo "master"
+}
+
+slave_logring() {
+  echo "slave"
+}
+
+install_usage() {
+  printf "%b" "
+  Usage:
+    ${0} [options]
+
+  Options:
+    --logfile-rails=<file>
+    --logfile-rails3=<file>
+    --logfile-merb=<file>
+    --logfile-rack=<file>
+    --logfile-delayed_job=<file>
+    --logfile-apache=<file>
+    --logfile-amazon_s3=<file>
+    --logfile-mysql=<file>
+    --logfile-nginx=<file>
+    --logfile-postgresql=<file>
+    --logfile-oink=<file>
+    --logfile-haproxy=<file>
+    Each option can be repeated several times.
+    You may have various different rails logs to analyze.
+
+    --master  install the central node
+    --slave   install a slave node
+    --dest    where to install logring config and files (default to ./logring)
+
+    --trace   debug view
+    --help    this help text
+
+"
+}
+
+parse_args() {
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "$token" in
+      (--logfile-[_a-z]*=*)
+        value="${token#*=}"
+        token="${token%%=*}"
+        logtype="${token#--*-}"
+        if [[ ! -f "${value}" && ! -L "${value}" ]]
+        then
+          echo "$value does not exist."
+          exit 1
+        elif [[ ! -r "${value}" ]]
+        then
+          echo "$value is not readable."
+          exit 1
+        else
+          export lr_logfile
+        fi
+        ;;
+      (--dest)
+
+      (--trace)
+        ;;
+      (--version)
+        show_version
+        exit 0
+        ;;
+      (--master)
+        master_logring
+        exit 0
+        ;;
+      (--slave)
+        slave_logring
+        exit 0
+        ;;
+      (*)
+        install_usage
+        exit 0
+        ;;
+    esac
+  done
+  echo "ok"
+}
+
+parse_args "$@"
+exit 0
