@@ -60,7 +60,7 @@ module Logring
           if test "[ -d #{h.properties.path} ]"
             info "#{h.properties.name} is already initialized."
           else
-            execute "curl -s -L #{Logring::Config.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
+            info capture "curl -s -L #{Logring::Config.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
           end
 
         end

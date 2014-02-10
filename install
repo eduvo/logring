@@ -32,6 +32,8 @@ base_install() {
   else
     echo "gem 'logring', path: '${CURDIR}'" >> Gemfile
   fi
+  echo "bundling"
+  type bundle
   bundle install
   if [[ $? == 0 ]]
     then
