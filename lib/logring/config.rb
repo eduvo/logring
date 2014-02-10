@@ -7,5 +7,8 @@ module Logring
       FileUtils.cp(Logring::CONFIGFILE_TEMPLATE, configfile) unless File.exists? configfile
       @__config ||= Logring::Utils.to_ostruct(YAML::load_file(configfile))
     end
+    def install_url
+      @__config.install_url
+    end
   end
 end

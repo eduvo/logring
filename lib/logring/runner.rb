@@ -28,16 +28,16 @@ module Logring
     end
 
     def check
-      SSHKit::Coordinator.new(@hosts.values).each in: :parallel do |host|
-        if test "[ -d #{host.properties.path} ]"
-          within host.properties.path do
-            host.properties.logs.to_h.each do |k,l|
+      SSHKit::Coordinator.new(@hosts.values).each in: :parallel do |h|
+        if test "[ -d #{h.properties.path} ]"
+          within h.properties.path do
+            h.properties.logs.to_h.each do |k,l|
               execute :pwd
               info capture :echo, :bundle, 'exec', 'request-log-analyzer', '-f', k, l
             end
           end
         else
-          error "#{host.properties.name} is not initialized, Run `logring init #{host.properties.name}` first."
+          error "#{h.properties.name} is not initialized, Run `logring init #{h.properties.name}` first."
         end
       end
     rescue Exception => e
@@ -46,16 +46,21 @@ module Logring
     end
 
     def hosts_list
-      @hosts.keys
+      @hosts
     end
 
     def init(host)
       if @hosts[host]
         SSHKit::Coordinator.new(@hosts[host]).each do |h|
-          info capture(:uptime)
+          if test "[ -d #{h.properties.path} ]"
+            info "#{h.properties.name} is already initialized."
+          else
+            execute "curl -s -L #{Logring::Config.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
+          end
+
         end
       else
-        error "Host '#{host}' not found."
+        error "Host '#{h.properties.name}' not found."
       end
     end
 

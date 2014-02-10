@@ -1,15 +1,18 @@
 ---
-webdir: www
-logdir: log # or STDOUT to have logging on console
-loglevel: info
+webdir: www              # dir local to logring installation where to save static web pages
+logdir: log              # dir local to logring or STDOUT to have logging on console
+loglevel: info           # can be debug, info, warn, error, fatal
+install_url: https://raw.github.com/eduvo/logring/master/install
 nodes:
-  firstnode.example.com:
-    name: firstnode
-    user: dev
-    # port: 22
-    path: ~/logring
+  firstnode.example.com: # hostname that you can ssh to
+    name: firstnode      # name used by logring in its cli
+    user: dev            # user that you can ssh with
+    # port: 22           # port you need to use for ssh, if absent 22 is used
+    path: ~/logring      # remote path where cache files are stored
     logs:
-      rails:
-        - /srv/railsapp/shared/log/production.log
-      nginx:
-        - /var/log/nginx/access.log
+      web:
+        type: nginx
+        file: /var/log/nginx/access.log
+      app:
+        type: rails
+        file: /srv/railsapp/shared/log/sandbox.log

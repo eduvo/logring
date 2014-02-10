@@ -22,7 +22,12 @@ module Logring
       config = Logring::Config.load options[:configfile]
       runner = Logring::Runner.new config
       puts "Found #{runner.hosts_list.count} configured hosts:"
-      puts "    " + runner.hosts_list.join("\n    ")
+      runner.hosts_list.each do |h,d|
+        puts "    #{h}"
+        d.properties.logs.to_h.each do |t,l|
+          puts "      #{t}: #{l.type} - #{l.file}"
+        end
+      end
     rescue Exception => e
       puts "*** Error ***"
       puts "*** " + e.message
