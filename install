@@ -32,8 +32,7 @@ base_install() {
   else
     echo "gem 'logring', path: '${CURDIR}'" >> Gemfile
   fi
-  echo "bundling"
-  #bundle install
+  bundle install
   if [[ $? == 0 ]]
     then
     echo "... all installed."
@@ -50,7 +49,9 @@ slave_install() {
   mkdir "cache" 2> /dev/null
   echo "source 'https://rubygems.org'" > Gemfile
   echo "gem 'request-log-analyzer'" >> Gemfile
+  echo "bundling ${?}"
   bundle install
+  echo "bundled ${?}"
   if [[ $? == 0 ]]
     then
     echo "... all installed."
