@@ -1,4 +1,5 @@
 ---
+webdir: /var/www/logring
 nodes:
   firstnode.example.com:
     name: firstnode
