@@ -27,8 +27,13 @@ module Logring
       end
     end
 
-    def check
-      SSHKit::Coordinator.new(@hosts.values).each in: :parallel do |h|
+    def check(host)
+      if @hosts[host]
+        remotehost = @hosts[host]
+      else
+        remotehost = @hosts.values
+      end
+      SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
         if test "[ -d #{h.properties.path} ]"
           within h.properties.path do
             h.properties.logs.to_h.each do |k,l|

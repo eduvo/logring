@@ -21,7 +21,7 @@ module Logring
       runner.hosts_list.each do |h,d|
         puts "    #{h}"
         d.properties.logs.to_h.each do |t,l|
-          puts "      #{t}: #{l.type} - #{l.file}"
+          puts "        #{t}: #{l.type} - #{l.file}"
         end
       end
     rescue Exception => e
@@ -30,18 +30,23 @@ module Logring
       puts "*************"
     end
 
-    desc "check", "Verifies that config file is usable."
-    def check
+    desc "check [HOST]", "Verifies config for all hosts or one host."
+    long_desc <<-LONGDESC
+      - If you provide a HOST argument it will check config for that host.
+
+      - Without HOST specified it will check the list of all host defined in the config file.
+    LONGDESC
+    def check(host=nil)
       config = Logring::Config.load options[:configfile]
       runner = Logring::Runner.new config
-      runner.check
+      runner.check(host)
     rescue Exception => e
       puts "*** Error ***"
       puts "*** " + e.message
       puts "*************"
     end
 
-    desc "init", "Prepare the remote node."
+    desc "init [HOST]", "Prepare the remote host."
     def init(host)
       config = Logring::Config.load options[:configfile]
       runner = Logring::Runner.new config
