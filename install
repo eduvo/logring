@@ -51,7 +51,7 @@ slave_install() {
   echo "gem 'request-log-analyzer'" >> Gemfile
   echo "bundling ${?}"
   type bundle
-  bundle install
+  bundle install 2>&1
   echo "bundled ${?}"
   if [[ $? == 0 ]]
     then
