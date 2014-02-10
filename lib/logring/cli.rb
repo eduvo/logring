@@ -20,7 +20,9 @@ module Logring
     desc "list", "Lists nodes controlled by this Logring."
     def list
       config = Logring::Config.load options[:configfile]
-      ap config
+      runner = Logring::Runner.new config
+      puts "Found #{runner.hosts_list.count} configured hosts:"
+      puts "    " + runner.hosts_list.join("\n    ")
     rescue Exception => e
       puts "*** Error ***"
       puts "*** " + e.message

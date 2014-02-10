@@ -35,6 +35,10 @@ module Logring
       puts "*** " + e.message
     end
 
+    def hosts_list
+      @hosts.map(&:properties).map(&:name)
+    end
+
     def init(host)
       puts host
     end
