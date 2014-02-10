@@ -17,9 +17,13 @@ module Logring
         a
       end
       begin
-        set_logger(File.join(@config.logdir, 'logring.log'), @config.loglevel)
+        if @config.logdir == 'STDOUT'
+          set_logger(STDOUT, @config.loglevel)
+        else
+          set_logger(File.join(@config.logdir, 'logring.log'), @config.loglevel)
+        end
       rescue Exception => e
-        error "*** " + e.message
+        puts "*** " + e.message
       end
     end
 

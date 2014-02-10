@@ -1,6 +1,6 @@
 ---
 webdir: www
-logdir: log
+logdir: log # or STDOUT to have logging on console
 loglevel: info
 nodes:
   firstnode.example.com:
