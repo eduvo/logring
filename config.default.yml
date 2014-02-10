@@ -1,5 +1,7 @@
 ---
-webdir: /var/www/logring
+webdir: www
+logdir: log
+loglevel: info
 nodes:
   firstnode.example.com:
     name: firstnode

@@ -5,6 +5,7 @@ require "sshkit"
 require "logring/version"
 require "logring/config"
 require "logring/utils"
+require "logring/logger"
 require "logring/runner"
 
 module Logring

@@ -33,7 +33,6 @@ base_install() {
     echo "gem 'logring', path: '${CURDIR}'" >> Gemfile
   fi
   bundle install
-  rvm list
   if [[ $? == 0 ]]
     then
     echo "... all installed."
