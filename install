@@ -50,8 +50,12 @@ slave_install() {
   echo "source 'https://rubygems.org'" > Gemfile
   echo "gem 'request-log-analyzer'" >> Gemfile
   echo "bundling ${?}"
-  which bundle
-  bash -l 'bundle install'
+  which ruby
+  if [[ $? != 0 ]]
+    echo "Ruby cannot be found."
+    exit 1
+  fi
+  bundle install
   echo "bundled ${?}"
   if [[ $? == 0 ]]
     then
