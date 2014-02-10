@@ -1,11 +1,12 @@
 ---
 nodes:
-  - name: firstnode
-    host: firstnode.example.com
-    port: 22
+  firstnode.example.com:
+    name: firstnode
     user: dev
+    # port: 22
+    path: ~/logring
     logs:
-      - type: rails
-        file: /srv/railsapp/shared/log/production.log
-      - type: nginx
-        file: /var/log/nginx/access.log
+      rails:
+        - /srv/railsapp/shared/log/production.log
+      nginx:
+        - /var/log/nginx/access.log

@@ -1,4 +1,3 @@
-require 'yaml'
 require 'logring'
 
 module Logring
@@ -6,7 +5,7 @@ module Logring
     extend self
     def load(configfile)
       FileUtils.cp(Logring::CONFIGFILE_TEMPLATE, configfile) unless File.exists? configfile
-      @__config ||= YAML::load_file(configfile)
+      @__config ||= Logring::Utils.to_ostruct(YAML::load_file(configfile))
     end
   end
 end

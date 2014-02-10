@@ -1,6 +1,11 @@
+require "yaml"
+require "awesome_print"
+require "sshkit"
+
 require "logring/version"
 require "logring/config"
-require "yaml"
+require "logring/utils"
+require "logring/runner"
 
 module Logring
   CONFIGFILE_TEMPLATE = File.expand_path("../../config.default.yml", __FILE__)

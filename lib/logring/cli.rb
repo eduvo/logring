@@ -20,6 +20,29 @@ module Logring
     desc "list", "Lists nodes controlled by this Logring."
     def list
       config = Logring::Config.load options[:configfile]
+      ap config
+    rescue Exception => e
+      puts "*** Error ***"
+      puts "*** " + e.message
+      puts "*************"
+    end
+
+    desc "check", "Verifies that config file is usable."
+    def check
+      config = Logring::Config.load options[:configfile]
+      runner = Logring::Runner.new config
+      runner.check
+    rescue Exception => e
+      puts "*** Error ***"
+      puts "*** " + e.message
+      puts "*************"
+    end
+
+    desc "init", "Prepare the remote node."
+    def init(host)
+      config = Logring::Config.load options[:configfile]
+      runner = Logring::Runner.new config
+      runner.init(host)
     rescue Exception => e
       puts "*** Error ***"
       puts "*** " + e.message

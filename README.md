@@ -8,19 +8,19 @@ Under development. DO NOT USE (yet).
 
 Be sure you have a running default ruby and curl installed.
 
-    curl -s -L https://raw.github.com/eduvo/logring/master/install | bash -s -- --master
+    curl -s -L https://raw.github.com/eduvo/logring/master/install | bash -s -- --dest=./logring
 
 Availble options
 
-    --master  install the central node
-    --slave   install a slave node
     --dest    where to install logring config and files (default to ./logring)
     --trace   debug view
     --help    this help text
 
 ## Usage
 
-TODO: Write usage instructions here
+From logring directory:
+
+    bundle exec logring list
 
 ## Contributing
 
