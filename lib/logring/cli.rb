@@ -27,8 +27,6 @@ module Logring
           puts "        #{t}: #{l.type} - #{l.file}"
         end
       end
-    rescue Exception => e
-      puts "*** Error: " + e.message
     end
 
     desc "check [HOST]", "Verifies config for all hosts or one host."
@@ -39,22 +37,16 @@ module Logring
     LONGDESC
     def check(host=nil)
       Logring::Runner.new(options[:configfile]).check(host)
-    rescue Exception => e
-      puts "*** Error: " + e.message
     end
 
     desc "init [HOST]", "Prepare the remote host."
     def init(host)
       Logring::Runner.new(options[:configfile]).init(host)
-    rescue Exception => e
-      puts "*** Error: " + e.message
     end
 
     desc "grab [HOST] [TASK]", "Generate reports for the given host."
     def grab(host=nil,task=nil)
       Logring::Runner.new(options[:configfile]).grab(host,task)
-    # rescue Exception => e
-    #   puts "*** Error: " + e.message
     end
 
     desc "build", "Builds the reports webpages."

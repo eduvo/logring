@@ -14,7 +14,6 @@ module Logring
       File.open(File.join(@vars.webdir, "nav.html"), "w") do |f|
         f.puts nav
       end
-      ap @vars
       @vars.nodes.to_h.each do |k,v|
         subdir = File.join(@vars.webdir, v.name)
         FileUtils.mkdir_p(subdir) unless Dir.exists? subdir
