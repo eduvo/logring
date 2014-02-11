@@ -70,10 +70,9 @@ module Logring
           if test "[ -d #{h.properties.path} ]"
             info "#{h.properties.name} is already initialized."
           else
-            info capture "curl -s -L #{Logring::Config.vars.install_url} | bash -s -- --dest=#{h.properties.path} --slave "
+            info capture "curl -s -L #{Logring::Config.vars.install_url} | bash -s -- --dest=#{h.properties.path} --slave"
             within h.properties.path do
-              execute "bash -l '#{h.properties.bundle} install'"
-              execute "bash -l '#{sudo} /usr/local/rbenv/bin/rbenv rehash'"
+              execute "bash -l -c '#{sudo} /usr/local/rbenv/bin/rbenv rehash'"
             end
           end
         end
