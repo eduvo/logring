@@ -30,7 +30,7 @@ base_install() {
     then
     echo "gem 'logring'" >> Gemfile
   else
-    echo "gem 'logring', path: '${CURDIR}'" >> Gemfile
+    echo "gem 'logring', github: 'eduvo/logring'" >> Gemfile
   fi
   bundle install
   if [[ $? == 0 ]]
