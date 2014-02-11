@@ -1,0 +1,10 @@
+html
+  head
+    title Logring nav
+  body
+    h1 Hosts
+    ul
+    - nodes.to_h.each do |k,h|
+      li
+        a href="#{k}/index.html" target="host"
+          = k

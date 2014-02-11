@@ -1,0 +1,10 @@
+html
+  head
+    title Logring #{name} nav
+  body
+    h1 Logs
+    ul
+    - logs.to_h.each do |k,h|
+      li
+        a href="#{k}.html" target="details"
+          = k

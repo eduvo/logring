@@ -9,6 +9,7 @@ nodes:
     user: dev            # user that you can ssh with
     # port: 22           # port you need to use for ssh, if absent 22 is used
     path: ~/logring      # remote path where cache files are stored
+    sudo: true           # can we or can we not use sudo there
     logs:
       web:
         type: nginx

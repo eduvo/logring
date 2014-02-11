@@ -2,9 +2,10 @@ module Logring
   class Runner
     include Logring::Log
 
-    def initialize(config)
-      @config = config
-      @hosts = config.nodes.to_h.reduce({}) do |a,(h,i)|
+    def initialize(configfile)
+      Logring::Config.load configfile
+      @config = Logring::Config.vars
+      @hosts = @config.nodes.to_h.reduce({}) do |a,(h,i)|
         b = ""
         b += "#{i.user}@" if i.respond_to? :user
         b += h.to_s
@@ -13,6 +14,8 @@ module Logring
         host.properties.logs = i.logs
         host.properties.path = i.path
         host.properties.name = i.name
+        host.properties.sudo = i.sudo
+        host.properties.bundle = i.bundle || "bundle"
         a[i.name] = host
         a
       end
@@ -34,11 +37,17 @@ module Logring
         remotehost = @hosts.values
       end
       SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
+        sudo = h.properties.sudo ? "sudo" : nil
         if test "[ -d #{h.properties.path} ]"
           within h.properties.path do
             h.properties.logs.to_h.each do |k,l|
-              execute :pwd
-              info capture :echo, :bundle, 'exec', 'request-log-analyzer', '-f', k, l
+              if capture("if #{sudo} [ ! -f #{l.file} ];then echo 1;fi") == "1"
+                error "#{h.properties.name} #{k}: #{l.file} does not exist on #{h.properties.name}."
+              elsif !sudo and test "[ ! -r #{l.file} ]"
+                error "#{h.properties.name} #{k}: #{l.file} is not readable on #{h.properties.name} (permission problem)."
+              else
+                info "#{h.properties.name} #{k}: #{l.file} exists and is readable."
+              end
             end
           end
         else
@@ -56,22 +65,46 @@ module Logring
 
     def init(host)
       if @hosts[host]
-        SSHKit.config.command_map[:bundle] = "/usr/local/rbenv/shims/bundle"
         SSHKit::Coordinator.new(@hosts[host]).each do |h|
           if test "[ -d #{h.properties.path} ]"
             info "#{h.properties.name} is already initialized."
           else
-            info capture "curl -s -L #{Logring::Config.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
+            info capture "curl -s -L #{Logring::Config.vars.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
             within h.properties.path do
-              with path: '/usr/local/rbenv/shims:$PATH' do
-                execute :bundle, 'install'
-              end
+              execute "#{h.properties.bundle} install"
             end
           end
-
         end
       else
         error "Host '#{h.properties.name}' not found."
+      end
+    end
+
+    def grab(host,task)
+      if @hosts[host]
+        remotehost = @hosts[host]
+      else
+        remotehost = @hosts.values
+      end
+      SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
+        if task
+          tasks = { task => h.properties.logs[task] }
+        else
+          tasks = h.properties.logs.to_h
+        end
+        sudo = h.properties.sudo ? "sudo" : ""
+        within h.properties.path do
+          tasks.each do |k,l|
+            if test "[ -d cache/#{k} ]"
+              execute :mkdir, "cache/#{k}"
+            end
+            if execute "#{sudo} #{h.properties.bundle} exec request-log-analyzer --silent -f #{l.type} --file cache/#{k}/index.html --output html' #{l.file}"
+              destdir = "#{Logring::Config.webdir}/#{h.properties.name}/#{k}"
+              FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
+              download! "#{h.properties.path}/cache/#{k}/index.html", "#{Logring::Config.webdir}/#{h.properties.name}/#{k}"
+            end
+          end
+        end
       end
     end
 
