@@ -1,23 +1,12 @@
 html
   head
     title Logring #{name} nav
-    css:
-      body {
-        font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
-        color: #4f6b72;
-        background: #E6EAE9;
-        padding-left:20px;
-        padding-top:20px;
-        padding-bottom:20px;
-      }
-      a {
-        color: #c75f3e;
-      }
+    link href="../style.css" media="all" rel="stylesheet" type="text/css"
 
   body
     h1 Logs
     ul
-    - logs.to_h.each do |k,h|
-      li
-        a href="#{k}.html" target="details"
-          = k
+      - logs.to_h.each do |k,h|
+        li
+          a href="#{k}.html" target="details"
+            = k
