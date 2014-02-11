@@ -66,12 +66,14 @@ module Logring
     def init(host)
       if @hosts[host]
         SSHKit::Coordinator.new(@hosts[host]).each do |h|
+          sudo = h.properties.sudo ? "sudo" : nil
           if test "[ -d #{h.properties.path} ]"
             info "#{h.properties.name} is already initialized."
           else
             info capture "curl -s -L #{Logring::Config.vars.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
             within h.properties.path do
               execute "#{h.properties.bundle} install"
+              execute "#{sudo} /usr/local/rbenv/bin/rbenv rehash"
             end
           end
         end
@@ -88,21 +90,17 @@ module Logring
       end
       SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
         if task
-          tasks = { task => h.properties.logs[task] }
+          tasks = { task => h.properties.logs.to_h[task.to_sym] }
         else
           tasks = h.properties.logs.to_h
         end
         sudo = h.properties.sudo ? "sudo" : ""
         within h.properties.path do
           tasks.each do |k,l|
-            if test "[ -d cache/#{k} ]"
-              execute :mkdir, "cache/#{k}"
-            end
-            if execute "#{sudo} #{h.properties.bundle} exec request-log-analyzer --silent -f #{l.type} --file cache/#{k}/index.html --output html' #{l.file}"
-              destdir = "#{Logring::Config.webdir}/#{h.properties.name}/#{k}"
-              FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
-              download! "#{h.properties.path}/cache/#{k}/index.html", "#{Logring::Config.webdir}/#{h.properties.name}/#{k}"
-            end
+            execute "#{sudo} request-log-analyzer --silent -f #{l.type} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
+            destdir = "#{Logring::Config.vars.webdir}/#{h.properties.name}"
+            FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
+            download! "#{h.properties.path}/cache/#{k}.html", "#{destdir}/#{k}.html"
           end
         end
       end

@@ -52,9 +52,9 @@ module Logring
 
     desc "grab [HOST] [TASK]", "Generate reports for the given host."
     def grab(host=nil,task=nil)
-      Logring::Runner.new(options[:configfile]).generate(host,task)
-    rescue Exception => e
-      puts "*** Error: " + e.message
+      Logring::Runner.new(options[:configfile]).grab(host,task)
+    # rescue Exception => e
+    #   puts "*** Error: " + e.message
     end
 
     desc "build", "Builds the reports webpages."
