@@ -56,13 +56,16 @@ module Logring
 
     def init(host)
       if @hosts[host]
+        SSHKit.config.command_map[:bundle] = "/usr/local/rbenv/shims/bundle"
         SSHKit::Coordinator.new(@hosts[host]).each do |h|
           if test "[ -d #{h.properties.path} ]"
             info "#{h.properties.name} is already initialized."
           else
             info capture "curl -s -L #{Logring::Config.install_url} | bash -s -- --slave --dest=#{h.properties.path}"
             within h.properties.path do
-              execute :bundle, 'install'
+              with path: '/usr/local/rbenv/shims:$PATH' do
+                execute :bundle, 'install'
+              end
             end
           end
 
