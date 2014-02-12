@@ -72,6 +72,10 @@ module Logring
           else
             info capture "curl -s -L #{Logring::Config.vars.install_url} | bash -s -- --dest=#{h.properties.path} --slave"
             within h.properties.path do
+<<<<<<< HEAD
+=======
+              execute "bash -l -c '#{h.properties.bundle} install'"
+>>>>>>> 7280d23... fix remoet bash
               execute "bash -l -c '#{sudo} /usr/local/rbenv/bin/rbenv rehash'"
             end
           end
