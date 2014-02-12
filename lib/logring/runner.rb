@@ -82,7 +82,7 @@ module Logring
       end
     end
 
-    def grab(host,task)
+    def grab_report(host,task)
       if @hosts[host]
         remotehost = @hosts[host]
       else
@@ -97,7 +97,7 @@ module Logring
         sudo = h.properties.sudo ? "sudo" : ""
         within h.properties.path do
           tasks.each do |k,l|
-            execute "#{sudo} request-log-analyzer --silent -f #{l.type} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
+            execute "#{sudo} request-log-analyzer --silent -f #{l.report} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
             destdir = "#{Logring::Config.vars.webdir}/#{h.properties.name}"
             FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
             download! "#{h.properties.path}/cache/#{k}.html", "#{destdir}/#{k}.html"

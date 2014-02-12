@@ -22,9 +22,12 @@ module Logring
       runner = Logring::Runner.new options[:configfile]
       puts "Found #{runner.hosts_list.count} configured hosts:"
       runner.hosts_list.each do |h,d|
-        puts "    #{h}"
+        puts "    #{h}:"
         d.properties.logs.to_h.each do |t,l|
-          puts "        #{t}: #{l.type} - #{l.file}"
+          puts "      #{t}: #{l.file}"
+          if l.report
+            puts "        #{l.report}"
+          end
         end
       end
     end
@@ -44,9 +47,14 @@ module Logring
       Logring::Runner.new(options[:configfile]).init(host)
     end
 
-    desc "grab [HOST] [TASK]", "Generate reports for the given host."
-    def grab(host=nil,task=nil)
-      Logring::Runner.new(options[:configfile]).grab(host,task)
+    desc "grab_report [HOST] [TASK]", "Generate reports for the given host."
+    def grab_report(host=nil,task=nil)
+      Logring::Runner.new(options[:configfile]).grab_report(host,task)
+    end
+
+    desc "grab_alarms [HOST] [TASK]", "Generate reports for the given host."
+    def grab_alarms(host=nil,task=nil)
+      Logring::Runner.new(options[:configfile]).grab_alarms(host,task)
     end
 
     desc "build", "Builds the reports webpages."

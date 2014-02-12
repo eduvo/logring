@@ -12,8 +12,8 @@ nodes:
     sudo: true           # can we or can we not use sudo there
     logs:
       web:
-        type: nginx
+        report: nginx
         file: /var/log/nginx/access.log
       app:
-        type: rails
+        report: rails
         file: /srv/railsapp/shared/log/sandbox.log
