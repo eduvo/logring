@@ -49,7 +49,7 @@ slave_install() {
   mkdir "cache" 2> /dev/null
   echo "source 'https://rubygems.org'" > Gemfile
   echo "gem 'request-log-analyzer'" >> Gemfile
-  bash -l -c "cd ${DESTDIR} && /usr/local/rbenv/shims/bundle install" 2>&1
+  #bash -l -c "cd ${DESTDIR} && /usr/local/rbenv/shims/bundle install" 2>&1
   if [[ $? == 0 ]]
     then
     echo "... all installed."

@@ -6,7 +6,6 @@ module Logring
     extend Logring::Log
 
     def check(hosts, options, *args)
-      info "Check invoked on #{hosts}."
       SSHKit::Coordinator.new(hosts).each options do |h|
         sudo = h.properties.sudo ? "sudo" : nil
         if test "[ -d #{h.properties.path} ]"
@@ -42,8 +41,25 @@ module Logring
       end
     end
 
-    def report(hosts, tasks)
-      info "Check invoked on #{hosts} with #{tasks}."
+    def report(hosts, options, task=nil)
+      SSHKit::Coordinator.new(hosts).each options do |h|
+        if task
+          tasks = { task => h.properties.logs.to_h[task.to_sym] }
+        else
+          tasks = h.properties.logs.to_h
+        end
+        sudo = h.properties.sudo ? "sudo" : ""
+        if action == 'report' && h.properties.logs.report
+          within h.properties.path do
+            tasks.each do |k,l|
+              execute "#{sudo} request-log-analyzer --silent -f #{l.report} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
+              destdir = "#{Logring::Config.vars.webdir}/#{h.properties.name}"
+              FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
+              download! "#{h.properties.path}/cache/#{k}.html", "#{destdir}/#{k}.html"
+            end
+          end
+        end
+      end
     end
 
   end
