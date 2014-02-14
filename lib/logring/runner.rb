@@ -82,25 +82,29 @@ module Logring
       end
     end
 
-    def grab_report(host,task)
+    def grab(host, task, action)
       if @hosts[host]
         remotehost = @hosts[host]
+        options = {}
       else
         remotehost = @hosts.values
+        options = { in: :parallel }
       end
-      SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
+      SSHKit::Coordinator.new(remotehost).each options do |h|
         if task
           tasks = { task => h.properties.logs.to_h[task.to_sym] }
         else
           tasks = h.properties.logs.to_h
         end
         sudo = h.properties.sudo ? "sudo" : ""
-        within h.properties.path do
-          tasks.each do |k,l|
-            execute "#{sudo} request-log-analyzer --silent -f #{l.report} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
-            destdir = "#{Logring::Config.vars.webdir}/#{h.properties.name}"
-            FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
-            download! "#{h.properties.path}/cache/#{k}.html", "#{destdir}/#{k}.html"
+        if action == 'report' && h.properties.logs.report
+          within h.properties.path do
+            tasks.each do |k,l|
+              execute "#{sudo} request-log-analyzer --silent -f #{l.report} --file #{h.properties.path}/cache/#{k}.html --output html #{l.file}"
+              destdir = "#{Logring::Config.vars.webdir}/#{h.properties.name}"
+              FileUtils.mkdir_p(destdir) unless Dir.exists? destdir
+              download! "#{h.properties.path}/cache/#{k}.html", "#{destdir}/#{k}.html"
+            end
           end
         end
       end

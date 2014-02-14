@@ -47,14 +47,14 @@ module Logring
       Logring::Runner.new(options[:configfile]).init(host)
     end
 
-    desc "grab_report [HOST] [TASK]", "Generate reports for the given host."
-    def grab_report(host=nil,task=nil)
-      Logring::Runner.new(options[:configfile]).grab_report(host,task)
+    desc "grab [HOST] [TASK] [ACTION]", "Perform Action for the given host."
+    def grab_alarms(host=nil, task=nil, action=nil)
+      Logring::Runner.new(options[:configfile]).grab_alarms(host, task, action)
     end
 
-    desc "grab_alarms [HOST] [TASK]", "Generate reports for the given host."
-    def grab_alarms(host=nil,task=nil)
-      Logring::Runner.new(options[:configfile]).grab_alarms(host,task)
+    desc "grab_report [HOST] [TASK]", "Generate reports for the given host."
+    def grab_report(host=nil, task=nil)
+      Logring::Runner.new(options[:configfile]).grab_report(host, task, 'report')
     end
 
     desc "build", "Builds the reports webpages."
