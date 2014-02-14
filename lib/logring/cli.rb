@@ -19,27 +19,7 @@ module Logring
 
     desc "list [HOST]", "Lists nodes controlled by this Logring, or details for HOST."
     def list(host=nil)
-      runner = Logring::Runner.new options[:configfile]
-      hosts_list = runner.hosts_list
-      if host
-        if hosts_list[host]
-          hosts_list = { host => hosts_list[host] }
-        else
-          puts "#{host} not found. Check `logring list`."
-          return
-        end
-      else
-        puts "Found #{runner.hosts_list.count} configured hosts:"
-      end
-      hosts_list.each do |h,d|
-        puts "    #{h}:"
-        d.properties.logs.to_h.each do |t,l|
-          puts "      #{t}: #{l.file}"
-          if l.report
-            puts "        report type: #{l.report}"
-          end
-        end
-      end
+      puts Logring::Runner.new(options[:configfile]).show_list(host)
     end
 
     desc "check [HOST]", "Verifies config for all hosts or one host."

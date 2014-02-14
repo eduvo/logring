@@ -30,8 +30,28 @@ module Logring
       end
     end
 
-    def hosts_list
-      @hosts
+    def show_list(host=nil)
+      output = ""
+      if host
+        if @hosts[host]
+          hosts_list = { host => @hosts[host] }
+        else
+          return "#{host} not found. Check `logring list`."
+        end
+      else
+        hosts_list = @hosts
+        output += "Found #{@hosts.count} configured hosts:\n"
+      end
+      hosts_list.each do |h,d|
+        output += "    #{h}:\n"
+        d.properties.logs.to_h.each do |t,l|
+          output += "      #{t}: #{l.file}\n"
+          if l.report
+            output += "        report type: #{l.report}\n"
+          end
+        end
+      end
+      output
     end
 
     def init(host)
