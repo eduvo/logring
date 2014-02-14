@@ -17,16 +17,26 @@ module Logring
       default: File.expand_path("config.yml", Dir.pwd),
       desc: "Path to the configuration file to use"
 
-    desc "list", "Lists nodes controlled by this Logring."
-    def list
+    desc "list [HOST]", "Lists nodes controlled by this Logring, or details for HOST."
+    def list(host=nil)
       runner = Logring::Runner.new options[:configfile]
-      puts "Found #{runner.hosts_list.count} configured hosts:"
-      runner.hosts_list.each do |h,d|
+      hosts_list = runner.hosts_list
+      if host
+        if hosts_list[host]
+          hosts_list = { host => hosts_list[host] }
+        else
+          puts "#{host} not found. Check `logring list`."
+          return
+        end
+      else
+        puts "Found #{runner.hosts_list.count} configured hosts:"
+      end
+      hosts_list.each do |h,d|
         puts "    #{h}:"
         d.properties.logs.to_h.each do |t,l|
           puts "      #{t}: #{l.file}"
           if l.report
-            puts "        #{l.report}"
+            puts "        report type: #{l.report}"
           end
         end
       end
@@ -39,22 +49,22 @@ module Logring
       - Without HOST specified it will check the list of all host defined in the config file.
     LONGDESC
     def check(host=nil)
-      Logring::Runner.new(options[:configfile]).check(host)
+      Logring::Runner.new(options[:configfile]).do('check', host)
     end
 
     desc "init [HOST]", "Prepare the remote host."
     def init(host)
-      Logring::Runner.new(options[:configfile]).init(host)
+      Logring::Runner.new(options[:configfile]).do('init', host)
     end
 
-    desc "grab [HOST] [TASK] [ACTION]", "Perform Action for the given host."
+    desc "grab [HOST [TASK [ACTION]]]", "Perform Action for the given host."
     def grab_alarms(host=nil, task=nil, action=nil)
-      Logring::Runner.new(options[:configfile]).grab_alarms(host, task, action)
+      Logring::Runner.new(options[:configfile]).do(action, host, task)
     end
 
-    desc "grab_report [HOST] [TASK]", "Generate reports for the given host."
+    desc "grab_report [HOST [TASK]]", "Generate reports for the given host."
     def grab_report(host=nil, task=nil)
-      Logring::Runner.new(options[:configfile]).grab_report(host, task, 'report')
+      Logring::Runner.new(options[:configfile]).do('report', host, task)
     end
 
     desc "build", "Builds the reports webpages."

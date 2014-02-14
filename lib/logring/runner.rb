@@ -30,35 +30,6 @@ module Logring
       end
     end
 
-    def check(host)
-      if @hosts[host]
-        remotehost = @hosts[host]
-      else
-        remotehost = @hosts.values
-      end
-      SSHKit::Coordinator.new(remotehost).each in: :parallel do |h|
-        sudo = h.properties.sudo ? "sudo" : nil
-        if test "[ -d #{h.properties.path} ]"
-          within h.properties.path do
-            h.properties.logs.to_h.each do |k,l|
-              if capture("if #{sudo} [ ! -f #{l.file} ];then echo 1;fi") == "1"
-                error "#{h.properties.name} #{k}: #{l.file} does not exist on #{h.properties.name}."
-              elsif !sudo and test "[ ! -r #{l.file} ]"
-                error "#{h.properties.name} #{k}: #{l.file} is not readable on #{h.properties.name} (permission problem)."
-              else
-                info "#{h.properties.name} #{k}: #{l.file} exists and is readable."
-              end
-            end
-          end
-        else
-          error "#{h.properties.name} is not initialized, Run `logring init #{h.properties.name}` first."
-        end
-      end
-    rescue Exception => e
-      error "*** Error ***"
-      error "*** " + e.message
-    end
-
     def hosts_list
       @hosts
     end
@@ -82,7 +53,7 @@ module Logring
       end
     end
 
-    def grab(host, task, action)
+    def do(action, host=nil, task=nil)
       if @hosts[host]
         remotehost = @hosts[host]
         options = {}
@@ -90,6 +61,14 @@ module Logring
         remotehost = @hosts.values
         options = { in: :parallel }
       end
+      if Logring::Actions.respond_to? action.to_sym
+        Logring::Actions.send(action.to_sym, remotehost, options, task)
+      else
+        error "#{action} unknown."
+      end
+      return true
+
+
       SSHKit::Coordinator.new(remotehost).each options do |h|
         if task
           tasks = { task => h.properties.logs.to_h[task.to_sym] }

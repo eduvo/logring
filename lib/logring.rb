@@ -7,6 +7,7 @@ require "logring/config"
 require "logring/utils"
 require "logring/logger"
 require "logring/web"
+require "logring/actions"
 require "logring/runner"
 
 module Logring
